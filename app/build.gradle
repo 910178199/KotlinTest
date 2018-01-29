@@ -1,0 +1,48 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+// 新增
+apply plugin: 'net.ltgt.errorprone'
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        applicationId "app.test.kotlintest"
+        minSdkVersion 21
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    defaultConfig {
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    // 新增
+    tasks.withType(JavaCompile) {
+        // remove the if condition if you want to run NullAway on test code
+        if (!name.toLowerCase().contains("test")) {
+            options.compilerArgs += ["-Xep:NullAway:ERROR", "-XepOpt:NullAway:AnnotatedPackages=app.test.kotlintest"]
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    // 新增
+    annotationProcessor "com.uber.nullaway:nullaway:0.2.2"
+}
+repositories {
+    mavenCentral()
+}
